@@ -20,6 +20,9 @@
  * @subpackage Regal_Carousel/admin
  * @author     Neil Ipsen <ipsen.neil@gmail.com>
  */
+
+//include 'C:/wamp64/www/wordpress/wp-includes/plugin.php';
+
 class Regal_Carousel_Admin {
 
 	/**
@@ -39,7 +42,7 @@ class Regal_Carousel_Admin {
 	 * @var      string    $version    The current version of this plugin.
 	 */
 	private $version;
-
+	
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -51,6 +54,7 @@ class Regal_Carousel_Admin {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		add_action( 'admin_menu', array( $this, 'register_menus' ) );
 
 	}
 
@@ -100,4 +104,35 @@ class Regal_Carousel_Admin {
 
 	}
 
+	/*public function regal_carousel_options_page_html() {
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<form action="options.php" method="post">
+				<?php
+				// output security fields for the registered setting "regal_carousel_options"
+				settings_fields( 'regal_carousel_options' );
+				// output settings sections and their fields
+				// (sections are registered for "regal_carousel", each field is registered to a specific section)
+				do_settings_sections( 'regal_carousel' );
+				// output save settings button
+				submit_button( __( 'Save Settings', 'textdomain' ) );
+				?>
+			</form>
+		</div>
+		<?php
+	}*/
+
+	public function register_menus() {
+		add_submenu_page(
+			'upload.php',
+			'Regal Carousel',
+			'Regal Carousel Options',
+			'manage_options',
+			'regal-carousel',
+			'regal_carousel_options_page_html'
+		);
+	}
+
 }
+?>
