@@ -21,8 +21,6 @@
  * @author     Neil Ipsen <ipsen.neil@gmail.com>
  */
 
-//include 'C:/wamp64/www/wordpress/wp-includes/plugin.php';
-
 class Regal_Carousel_Admin {
 
 	/**
@@ -56,6 +54,40 @@ class Regal_Carousel_Admin {
 		$this->version = $version;
 		add_action( 'admin_menu', array( $this, 'register_menus' ) );
 
+	}
+
+	public function register_menus() {
+		add_submenu_page(
+			'upload.php',
+			'Regal Carousel',
+			'Regal Carousel',
+			'manage_options',
+			'regal-carousel',
+			'regal_carousel_options_page_html'
+		);
+	}
+
+	public function regal_carousel_options_page_html() {
+		// check user capabilities
+		if ( ! current_user_can( 'manage options' ) ) {
+			return;
+		}
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<form action="options.php" method="post">
+				<?php
+				// output security fields for the registered setting "regal_carousel_options"
+				settings_fields( 'regal_carousel_options' );
+				// output settings sections and their fields
+				// (sections are registered for "regal_carousel", each field is registered to a specific section)
+				do_settings_sections( 'regal_carousel' );
+				// output save settings button
+				submit_button( __( 'Save Settings', 'textdomain' ) );
+				?>
+			</form>
+		</div>
+		<?php
 	}
 
 	/**
@@ -102,36 +134,6 @@ class Regal_Carousel_Admin {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/regal-carousel-admin.js', array( 'jquery' ), $this->version, false );
 
-	}
-
-	/*public function regal_carousel_options_page_html() {
-		?>
-		<div class="wrap">
-			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-			<form action="options.php" method="post">
-				<?php
-				// output security fields for the registered setting "regal_carousel_options"
-				settings_fields( 'regal_carousel_options' );
-				// output settings sections and their fields
-				// (sections are registered for "regal_carousel", each field is registered to a specific section)
-				do_settings_sections( 'regal_carousel' );
-				// output save settings button
-				submit_button( __( 'Save Settings', 'textdomain' ) );
-				?>
-			</form>
-		</div>
-		<?php
-	}*/
-
-	public function register_menus() {
-		add_submenu_page(
-			'upload.php',
-			'Regal Carousel',
-			'Regal Carousel Options',
-			'manage_options',
-			'regal-carousel',
-			'regal_carousel_options_page_html'
-		);
 	}
 
 }
