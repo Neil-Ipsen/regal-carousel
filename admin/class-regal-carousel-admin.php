@@ -52,18 +52,52 @@ class Regal_Carousel_Admin {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		add_action( 'admin_menu', array( $this, 'register_menus' ) );
+		add_action( 'admin_menu', array( $this, 'register_menus' ), 30 );
+		add_filter( 'plugin_action_links_regal-carousel/regal-carousel.php', array( $this, 'settings_link' ) );
+
 
 	}
 
-	public function register_menus() {
+	public function settings_link( $links ) {
+		$settings_link = '<a href="upload.php?page=regal_carousel">Settings</a>';
+		array_push( $links, $settings_link );
+		return $links;
+	}
+
+	public static function register_menus() {
+		
 		add_submenu_page(
 			'upload.php',
 			'Regal Carousel',
 			'Regal Carousel',
 			'manage_options',
-			'regal-carousel',
-			'regal_carousel_options_page_html'
+			'regal_carousel',
+			array( $this, 'regal_carousel_options_page_html' )
+		);
+
+	}
+
+	public static function settings_init() {
+
+		register_setting(
+			'media',
+			'regal_carousel_options'
+		);
+
+		add_settings_section(
+			'regal_carousel_options',
+			'Options',
+			'regal_carousel_options_page_html',
+			'regal_carousel'
+		);
+
+		add_settings_field(
+			'regal_carousel_options_field',
+			'Option',
+			'regal_carousel_options_page_html',
+			'regal_carousel',
+			'regal_carousel_options',
+			''
 		);
 	}
 
@@ -97,44 +131,19 @@ class Regal_Carousel_Admin {
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Regal_Carousel_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Regal_Carousel_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/regal-carousel-admin.css', array(), $this->version, 'all' );
 
 	}
 
 	/**
-	 * Register the JavaScript for the admin area.
-	 *
+	 * Register the scripts for the admin area.
+	 * 
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Regal_Carousel_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Regal_Carousel_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/regal-carousel-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
 
 }
-?>
