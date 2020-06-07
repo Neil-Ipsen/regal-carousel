@@ -54,8 +54,14 @@ class Regal_Carousel_Admin {
 		$this->version = $version;
 		add_action( 'admin_menu', array( $this, 'register_menus' ), 30 );
 		add_filter( 'plugin_action_links_regal-carousel/regal-carousel.php', array( $this, 'settings_link' ) );
+		add_action( 'admin_init', array( $this, 'settings_init' ) );
+		register_activation_hook( __FILE__, array( $this, 'add_defaults' ) );
 
+	}
 
+	public function add_defaults() {
+		$arr = array( "text_string" => "Sample text" );
+		update_option( 'plugin_options', $arr );
 	}
 
 	public function settings_link( $links ) {
@@ -77,28 +83,38 @@ class Regal_Carousel_Admin {
 
 	}
 
-	public static function settings_init() {
+	public function regal_carousel_options_validate($input) {
+		$input[ 'text_string' ] = wp_filter_nohtml_kses( $input[ 'text_string' ] );
+		return $input;
+	}
+
+	public function settings_init() {
 
 		register_setting(
-			'media',
-			'regal_carousel_options'
+			'regal_carousel_options',
+			'regal_carousel_options',
+			'regal_carousel_options_validate'
 		);
 
 		add_settings_section(
-			'regal_carousel_options',
-			'Options',
+			'main_section',
+			'Regal Carousel Settings',
 			'regal_carousel_options_page_html',
-			'regal_carousel'
+			__FILE__
 		);
 
 		add_settings_field(
-			'regal_carousel_options_field',
-			'Option',
-			'regal_carousel_options_page_html',
-			'regal_carousel',
-			'regal_carousel_options',
-			''
+			'sample_field',
+			'Sample Field',
+			'setting_field_sample',
+			__FILE__,
+			'main_section'
 		);
+	}
+
+	public function setting_field_sample() {
+		$options = get_option( 'plugin_options' );
+		echo "<input id='sample_field' name='plugin_options[text_string]' size='40' type='text' value='{$options[text_string]}' />";
 	}
 
 	public function regal_carousel_options_page_html() {
@@ -115,7 +131,7 @@ class Regal_Carousel_Admin {
 				settings_fields( 'regal_carousel_options' );
 				// output settings sections and their fields
 				// (sections are registered for "regal_carousel", each field is registered to a specific section)
-				do_settings_sections( 'regal_carousel' );
+				do_settings_sections( __FILE__ );
 				// output save settings button
 				submit_button( __( 'Save Settings', 'textdomain' ) );
 				?>
